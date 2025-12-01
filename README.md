@@ -1,4 +1,4 @@
-# CloudCookbook-
+# CloudCookbook
 SaaS platform for panty-managemnt with a shared community cookbook.
 
 > **A cloud-native, multi-tenant recipe management system built for the modern web.**
