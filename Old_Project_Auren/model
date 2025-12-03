@@ -1,0 +1,22 @@
+from pydantic import BaseModel, Field
+"""
+Model Script - Classes used in other scripts
+
+This Script holds all Models / Classes used in other scripts like the individual Recipe's and PantryItems
+"""
+
+class Recipe(BaseModel):
+    recipe_id:int = Field(..., gt=0) #recipe_id shall be always greated than 0. If not error 422 (Validation Error) is thrown 
+    name:str = Field(..., min_length=1,examples=["Chicken Soup"])
+    ingredients:dict[str,int] = Field(..., examples=[{"potato":2,"carrot":1}],description="Ingredients and their Quantities")
+    prep_time_minutes:int = Field(...,gt=0)
+    description:str | None = None
+    instructions:list[str] = Field(...,description="Step-by-step cooking instructions",examples=[["Chop the vegetables finely.","Sauté onions until golden.","Simmer for 20 minutes."]])
+
+class PantryItem(BaseModel):
+    name:str = Field(..., min_length=1, description="Name of Ingredient")
+    amount:int = Field(..., description="Amount to add/remove")
+
+class StorageError(Exception):
+    """A custom error for when our JSON files are broken/dont work."""
+    pass

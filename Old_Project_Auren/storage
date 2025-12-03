@@ -1,0 +1,71 @@
+import json
+import os
+from model import StorageError
+
+"""
+Storage Script - Storing and loading JSON files
+
+This module handles all low-level file I/O operations for the Recipe Manager API.
+It manages reading and writing JSON data to the local 'data' directory,
+ensuring persistence for both Recipes and the Pantry inventory.
+"""
+
+# Defining the File Location
+DATA_DIR = "data"
+RECIPE_FILE = os.path.join(DATA_DIR,"Recipes.json")
+PANTRY_FILE = os.path.join(DATA_DIR, "Pantry.json")
+
+
+def _load_json(file, default_value=[]):
+    """loads the given json file and returns it.
+
+    Args:
+        file (_type_): the file to be read
+
+    Returns:
+        _type_: the returned values
+    """
+    if not os.path.exists(file): #Check if the file exists
+        return default_value
+    try:
+        with open(file,"r",encoding="utf-8") as file:
+            return json.load(file)
+    except json.JSONDecodeError: #Specific error if the file breaks the JSON format rules.
+        raise StorageError(f"CRITICAL: {file} is corrupted.")
+    except Exception as e: #catchall error
+        raise StorageError(f"System Error reading {file}: {e}")
+
+def _save_json(file, data):
+    """saves the given data to the specified json file.
+
+    Args:
+        file (_type_): the file to be saved into
+        data (_type_): the data to be saved
+
+    Returns:
+        _type_: the returned values
+    """
+    try:
+        with open(file,"w",encoding="utf-8") as file:
+            json.dump(data, file, indent=4, default=str)
+    except json.JSONDecodeError: #Specific error if the file breaks the JSON format rules.
+        raise StorageError(f"CRITICAL: {file} is corrupted.")
+    except Exception as e: #catchall error
+        raise StorageError(f"System Error reading {file}: {e}")
+    
+def get_recipes_data() -> list[dict]:
+    """Returns a list of dictionaries representing recipes."""
+    return _load_json(RECIPE_FILE)
+
+def set_recipes_data(data: list[dict]):
+    """Saves the given list as Recipes.json."""
+    _save_json(RECIPE_FILE, data)
+
+def get_pantry_data() -> dict[str, int]:
+    """Returns a Dict of ingredients, as this file only contains one element."""
+    return _load_json(PANTRY_FILE, {})
+
+def set_pantry_data(data: dict[str, int]):
+    """Saves the given dictionary as Pantry.json."""
+    _save_json(PANTRY_FILE, data)
+
